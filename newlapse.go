@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/mtib/newlapse/capture"
+	"github.com/klianc09/newlapse/capture"
 	"github.com/mtib/newlapse/convert"
 	"github.com/mtib/newlapse/crop"
 )
@@ -19,6 +19,7 @@ var (
 	folder          = flag.String("folder", "./capture", "which folder to do something with")
 	fps             = flag.Int("fps", 20, "ffmpeg framerate for videos")
 	config          = flag.String("config", "nil", "config to read screensetup from for cropping")
+	quality         = flag.Int("quality", 100, "quality of captures")
 )
 
 func main() {
@@ -34,7 +35,7 @@ func main() {
 			os.MkdirAll(*folder, os.ModePerm)
 		}
 		fmt.Println(`capturing into folder:`, *folder)
-		capture.Folder(*folder, *captureInterval)
+		capture.Folder(*folder, *captureInterval, *quality)
 	}
 	if *taskCrop {
 		fmt.Println(`cropping folder:`, *folder)

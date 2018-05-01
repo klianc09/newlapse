@@ -10,17 +10,12 @@ import (
 	"time"
 )
 
-const (
-	// Quality of images
-	Quality = "50"
-)
-
 // Folder does everything
-func Folder(dest string, interv int) {
+func Folder(dest string, interv int, quality int) {
 	sigs := make(chan os.Signal, 2)
 	signal.Notify(sigs, os.Interrupt, os.Kill)
 	tick := time.Tick(time.Duration(interv) * time.Second)
-	callScrot(dest, time.Now())
+	callScrot(dest, time.Now(), quality)
 	pic1, _ := ioutil.ReadDir(dest)
 	var size1 float64
 	for _, f := range pic1 {
@@ -40,7 +35,7 @@ scrotloop:
 		case <-sigs:
 			break scrotloop
 		case t := <-tick:
-			callScrot(dest, t)
+			callScrot(dest, t, quality)
 			fmt.Printf("picture #%010d taken\n", numpic)
 			numpic++
 		}
@@ -49,14 +44,14 @@ scrotloop:
 	fmt.Println("")
 }
 
-func callScrot(dest string, n time.Time) {
+func callScrot(dest string, n time.Time, quality int) {
 	filename := fmt.Sprintf("%s/%d-%02d-%02d_%02d-%02d-%02d_$wx$h.jpg", dest, n.Year(), n.Month(), n.Day(), n.Hour(), n.Minute(), n.Second())
 	var cmd *exec.Cmd
 	switch runtime.GOOS {
 	case "darwin":
 		cmd = exec.Command("screencapture", "-x", filename)
 	case "linux", "freebsd":
-		cmd = exec.Command("scrot", "-q", Quality, "-z", filename)
+		cmd = exec.Command("scrot", "-q", fmt.Sprint(quality), "-z", filename)
 	case "windows":
 		fmt.Errorf("%s", "Not able to take a screenshot on windows yet.")
 	}
